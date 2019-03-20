@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>{{ title }}</h1>
     <label for="poke-name">Please enter name of Pokemon:</label>
     <input 
       v-model="searchstring"
@@ -9,7 +9,7 @@
       type="text"
       >
     <br />
-    <small v-show='isLoading'>Loading...</small></li>
+    <small v-show='isLoading'>Loading...</small>
     <ul>
     <li v-show='errAPI'><small>{{ errAPI }}</small></li>
     <li v-show='errInput'><small>{{ errInput }}</small></li>
@@ -29,7 +29,7 @@ export default {
   name: 'PokeSearch',
   data () {
     return {
-      msg: 'Coding challenge for 3YOURMIND',
+      title: 'Coding challenge for 3YOURMIND',
       pokeName: '',
       abilities: null,
       searchstring: '',
@@ -62,9 +62,13 @@ export default {
           }
         }, 500)
     },
-    // checkLocalStorage: function () {
-
-    // }
+    checkLocalStorage: function () {
+      let keysArray = Object.keys(localStorage)
+      console.log(this.searchstring)
+      if (keysArray.includes(this.searchstring)) {
+        (this.abilities = localStorage[`${this.searchstring}`])
+      } 
+    }
   },
   components: {
     AbilitiesList
