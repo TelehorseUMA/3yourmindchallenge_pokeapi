@@ -41,33 +41,38 @@ export default {
   methods: {
     searchPokemon: function () {
       this.isLoading = true
-      setTimeout(
-        () => {
-          if (this.searchstring.length >= 3) {
+      if (!this.checkLocalStorage()) {
+        setTimeout(
+          () => {
+            if (this.searchstring.length >= 3) {
+              this.isLoading = false
+              this.errInput = ''
+              axios
+                .get(`https://pokeapi.co/api/v2/pokemon/${this.searchstring.toLowerCase()}`)
+                .then(res => 
+                    (this.abilities = res.data.abilities, 
+                    this.pokeName = this.searchstring.toLowerCase(), 
+                    this.errAPI='', 
+                    localStorage.setItem(this.pokeName, JSON.stringify(this.abilities)) )
+                )
+                .catch(err => (this.errAPI = `No Pokemon with that name found (${err})`))
+            }
+            else {
             this.isLoading = false
-            this.errInput = ''
-            axios
-              .get(`https://pokeapi.co/api/v2/pokemon/${this.searchstring.toLowerCase()}`)
-              .then(res => 
-                  (this.abilities = res.data.abilities, 
-                  this.pokeName = this.searchstring.toLowerCase(), 
-                  this.errAPI='', 
-                  localStorage.setItem(`${this.pokeName}`, `${this.abilities}` ))
-              )
-              .catch(err => (this.errAPI = `No Pokemon with that name found (${err})`))
-          }
-          else {
-          this.isLoading = false
-          this.errInput = 'Pokemon\'s name must be at least 3 characters long.'
-          }
-        }, 500)
+            this.errInput = 'Pokemon\'s name must be at least 3 characters long.'
+            }
+          }, 700)
+      }
+      else {
+        this.getLocalStorage()
+      }
     },
     checkLocalStorage: function () {
       let keysArray = Object.keys(localStorage)
-      console.log(this.searchstring)
-      if (keysArray.includes(this.searchstring)) {
-        (this.abilities = localStorage[`${this.searchstring}`])
-      } 
+      return (keysArray.includes(this.searchstring))
+    },
+    getLocalStorage: function () {
+      this.abilities = JSON.parse(localStorage.getItem(this.searchstring))
     }
   },
   components: {
